@@ -2,13 +2,10 @@ twitter-api-php
 ======================
 Simple PHP Wrapper for Twitter API v1.1 calls
 
-[![Total Downloads](https://poser.pugx.org/j7mbo/twitter-api-php/downloads.png)](https://packagist.org/packages/j7mbo/twitter-api-php)
-
-
 **[Changelog](https://github.com/J7mbo/twitter-api-php/wiki/Changelog)** ||
 **[Examples](https://github.com/J7mbo/twitter-api-php/wiki/Twitter-API-PHP-Wiki)** ||
 **[Wiki](https://github.com/J7mbo/twitter-api-php/wiki)** ||
-**[Buy me a beer!](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KHQYGY4MM3E7J)**
+**[Donate](https://github.com/J7mbo/twitter-api-php/wiki/Donate)**
 
 [Instructions in StackOverflow post here](http://stackoverflow.com/questions/12916539/simplest-php-example-retrieving-user-timeline-with-twitter-api-version-1-1/15314662#15314662) with examples. This post shows you how to get your tokens and more. 
 If you found it useful, please upvote / leave a comment! :)

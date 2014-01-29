@@ -8,7 +8,7 @@
  * @category Awesomeness
  * @package  Twitter-API-PHP
  * @author   James Mallison <me@j7mbo.co.uk>
- * @license  MIT License
+ * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  * @link     http://github.com/j7mbo/twitter-api-php
  */
 class TwitterAPIExchange
@@ -117,6 +117,28 @@ class TwitterAPIExchange
     {
         return $this->postfields;
     }
+
+    /**
+     * Unset getfield string
+     * 
+     * @return boolean
+     */
+    public function unsetGetfield()
+    {
+        $this->getfield = NULL;
+        return true;
+    }
+    
+    /**
+     * Unset postfields array
+     * 
+     * @return boolean
+     */
+    public function unsetPostfields()
+    {
+        $this->postfields = NULL;
+        return true;
+    }
     
     /**
      * Build the Oauth object using params set in construct and additionals
@@ -128,9 +150,9 @@ class TwitterAPIExchange
      */
     public function buildOauth($url, $requestMethod)
     {
-        if (!in_array(strtolower($requestMethod), array('post', 'get')))
+      if (!in_array(strtolower($requestMethod), array('post', 'get' , 'delete' , 'put' )))
         {
-            throw new Exception('Request method must be either POST or GET');
+            throw new Exception('Request method must be either POST, GET, PUT or DELETE');
         }
         
         $consumer_key = $this->consumer_key;
@@ -177,7 +199,7 @@ class TwitterAPIExchange
      * 
      * @return string json If $return param is true, returns json data.
      */
-    public function performRequest($return = true)
+    public function performRequest( $delete = false , $put = false , $return = true)
     {
         if (!is_bool($return)) 
         { 
@@ -189,25 +211,45 @@ class TwitterAPIExchange
         $getfield = $this->getGetfield();
         $postfields = $this->getPostfields();
 
-        $options = array( 
-            CURLOPT_HTTPHEADER => $header,
-            CURLOPT_HEADER => false,
-            CURLOPT_URL => $this->url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 10,
-        );
+        $this->unsetGetfield();    // Added by Manpreet 22 Nov 2013
+        $this->unsetPostfields();   // Added by Manpreet 22 Nov 2013
 
-        if (!is_null($postfields))
-        {
-            $options[CURLOPT_POSTFIELDS] = $postfields;
-        }
-        else
-        {
-            if ($getfield !== '')
-            {
-                $options[CURLOPT_URL] .= $getfield;
-            }
-        }
+	$options = array();
+
+	if( $delete ){
+	  $options = array( 
+			   CURLOPT_HTTPHEADER => $header,
+			   CURLOPT_HEADER => false,
+			   CURLOPT_URL => $this->url,
+			   CURLOPT_RETURNTRANSFER => true,
+			   CURLOPT_CUSTOMREQUEST  => "DELETE"
+			    );
+	}else if( $put ){
+	  $options = array( 
+			   CURLOPT_HTTPHEADER => $header,
+			   CURLOPT_HEADER => false,
+			   CURLOPT_URL => $this->url ,
+			   CURLOPT_RETURNTRANSFER => true,
+			   CURLOPT_CUSTOMREQUEST  => "PUT"
+			    );
+	}else{
+	  $options = array( 
+			   CURLOPT_HTTPHEADER => $header,
+			   CURLOPT_HEADER => false,
+			   CURLOPT_URL => $this->url,
+			   CURLOPT_RETURNTRANSFER => true		
+			    );
+
+	}
+
+	if (!is_null($postfields)){
+	  $options[CURLOPT_POSTFIELDS] = $postfields;
+	}else{
+	  if($getfield != '' ){
+	    $options[CURLOPT_URL] .= $getfield;
+	  }
+	}
+
 
         $feed = curl_init();
         curl_setopt_array($feed, $options);
