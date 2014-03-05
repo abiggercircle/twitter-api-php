@@ -223,6 +223,7 @@ class TwitterAPIExchange
 			   CURLOPT_URL => $this->url,
 			   CURLOPT_RETURNTRANSFER => true,
 			   CURLOPT_CUSTOMREQUEST  => "DELETE"
+			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'
 			    );
 	}else if( $put ){
 	  $options = array( 
@@ -231,13 +232,15 @@ class TwitterAPIExchange
 			   CURLOPT_URL => $this->url ,
 			   CURLOPT_RETURNTRANSFER => true,
 			   CURLOPT_CUSTOMREQUEST  => "PUT"
+			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'
 			    );
 	}else{
 	  $options = array( 
 			   CURLOPT_HTTPHEADER => $header,
 			   CURLOPT_HEADER => false,
 			   CURLOPT_URL => $this->url,
-			   CURLOPT_RETURNTRANSFER => true		
+			   CURLOPT_RETURNTRANSFER => true
+			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'			   
 			    );
 
 	}
