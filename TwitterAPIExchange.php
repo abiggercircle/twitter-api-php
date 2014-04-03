@@ -148,50 +148,49 @@ class TwitterAPIExchange
      * @param string $requestMethod Either POST or GET
      * @return \TwitterAPIExchange Instance of self for method chaining
      */
-    public function buildOauth($url, $requestMethod)
-    {
-      if (!in_array(strtolower($requestMethod), array('post', 'get' , 'delete' , 'put' )))
-        {
-            throw new Exception('Request method must be either POST, GET, PUT or DELETE');
-        }
-        
-        $consumer_key = $this->consumer_key;
-        $consumer_secret = $this->consumer_secret;
-        $oauth_access_token = $this->oauth_access_token;
-        $oauth_access_token_secret = $this->oauth_access_token_secret;
-        
-        $oauth = array( 
-            'oauth_consumer_key' => $consumer_key,
-            'oauth_nonce' => time(),
-            'oauth_signature_method' => 'HMAC-SHA1',
-            'oauth_token' => $oauth_access_token,
-            'oauth_timestamp' => time(),
-            'oauth_version' => '1.0'
-        );
-        
-        $getfield = $this->getGetfield();
-        
-        if (!is_null($getfield))
-        {
-            $getfields = str_replace('?', '', explode('&', $getfield));
-            foreach ($getfields as $g)
-            {
-                $split = explode('=', $g);
-                $oauth[$split[0]] = $split[1];
-            }
-        }
-        
-        $base_info = $this->buildBaseString($url, $requestMethod, $oauth);
-        $composite_key = rawurlencode($consumer_secret) . '&' . rawurlencode($oauth_access_token_secret);
-        $oauth_signature = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
-        $oauth['oauth_signature'] = $oauth_signature;
-        
-        $this->url = $url;
-        $this->oauth = $oauth;
-        
-        return $this;
+    public function buildOauth($url, $requestMethod){
+
+    if (!in_array(strtolower($requestMethod), array('post', 'get' , 'delete' , 'put' ))){
+        throw new Exception('Request method must be either POST, GET, PUT or DELETE');
     }
-    
+
+    $consumer_key = $this->consumer_key;
+    $consumer_secret = $this->consumer_secret;
+    $oauth_access_token = $this->oauth_access_token;
+    $oauth_access_token_secret = $this->oauth_access_token_secret;
+
+    $oauth = array( 
+        'oauth_consumer_key' => $consumer_key,
+        'oauth_nonce' => time(),
+        'oauth_signature_method' => 'HMAC-SHA1',
+        'oauth_token' => $oauth_access_token,
+        'oauth_timestamp' => time(),
+        'oauth_version' => '1.0'
+        );
+
+    $getfield = $this->getGetfield();
+
+    if (!is_null($getfield))
+    {
+        $getfields = str_replace('?', '', explode('&', $getfield));
+        foreach ($getfields as $g)
+        {
+            $split = explode('=', $g);
+            $oauth[$split[0]] = $split[1];
+        }
+    }
+
+    $base_info = $this->buildBaseString($url, $requestMethod, $oauth);
+    $composite_key = rawurlencode($consumer_secret) . '&' . rawurlencode($oauth_access_token_secret);
+    $oauth_signature = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
+    $oauth['oauth_signature'] = $oauth_signature;
+
+    $this->url = $url;
+    $this->oauth = $oauth;
+
+    return $this;
+    }
+
     /**
      * Perform the actual data retrieval from the API
      * 
@@ -199,69 +198,94 @@ class TwitterAPIExchange
      * 
      * @return string json If $return param is true, returns json data.
      */
-    public function performRequest( $delete = false , $put = false , $return = true)
+    public function performRequest( $action = 'GET', $return = true)
     {
         if (!is_bool($return)) 
         { 
             throw new Exception('performRequest parameter must be true or false'); 
         }
-        
-        $header = array($this->buildAuthorizationHeader($this->oauth), 'Expect:');
-        
+
         $getfield = $this->getGetfield();
         $postfields = $this->getPostfields();
 
         $this->unsetGetfield();    // Added by Manpreet 22 Nov 2013
         $this->unsetPostfields();   // Added by Manpreet 22 Nov 2013
 
-	$options = array();
+        $options = array();
 
-	if( $delete ){
-	  $options = array( 
-			   CURLOPT_HTTPHEADER => $header,
-			   CURLOPT_HEADER => false,
-			   CURLOPT_URL => $this->url,
-			   CURLOPT_RETURNTRANSFER => true,
-			   CURLOPT_CUSTOMREQUEST  => "DELETE"
-			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'
-			    );
-	}else if( $put ){
-	  $options = array( 
-			   CURLOPT_HTTPHEADER => $header,
-			   CURLOPT_HEADER => false,
-			   CURLOPT_URL => $this->url ,
-			   CURLOPT_RETURNTRANSFER => true,
-			   CURLOPT_CUSTOMREQUEST  => "PUT"
-			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'
-			    );
-	}else{
-	  $options = array( 
-			   CURLOPT_HTTPHEADER => $header,
-			   CURLOPT_HEADER => false,
-			   CURLOPT_URL => $this->url,
-			   CURLOPT_RETURNTRANSFER => true
-			   //,CURLOPT_CAINFO => 'c:/xampp/htdocs/cacert.crt'			   
-			    );
+        switch ($action) {
+            case 'GET':
+            $this->url = ($getfield != '') ? $this->url.$getfield : $this->url;
+            $header = array($this->buildAuthorizationHeader($this->oauth), 'Expect:');
+            $options = array( 
+              CURLOPT_HTTPHEADER => $header,
+              CURLOPT_HEADER => false,
+              CURLOPT_URL => $this->url,
+              CURLOPT_RETURNTRANSFER => true        
+              );
+            break;
 
-	}
+            case 'POST':
+            // $post_data = http_build_query($postfields);
+            // $options[CURLOPT_POSTFIELDS] = $post_data;
+            // $content_length = "Content-Length: ".strlen($post_data);
+            $header = array($this->buildAuthorizationHeader($this->oauth), 'Expect:');
 
-	if (!is_null($postfields)){
-	  $options[CURLOPT_POSTFIELDS] = $postfields;
-	}else{
-	  if($getfield != '' ){
-	    $options[CURLOPT_URL] .= $getfield;
-	  }
-	}
+            $options = array(
+              CURLOPT_HTTPHEADER => $header,
+              CURLOPT_POSTFIELDS => $postfields,
+              CURLOPT_HEADER => false,
+              CURLOPT_URL => $this->url ,
+              CURLOPT_RETURNTRANSFER => true
+              );
+            break;
 
+            case 'PUT':
+            // var_dump($postfields);exit();
+            // $postfields = array("paused"=>1);
+            $post_data = http_build_query($postfields);
+            // $options[CURLOPT_POSTFIELDS] = $post_data;
+            //$content_length = "Content-Length: ".strlen($post_data);
+            $header = array($this->buildAuthorizationHeader($this->oauth) , 'Expect:' ); //, 'Content-Type: application/x-www-form-urlencoded' , $content_length );
+
+            $options = array(
+              CURLOPT_HTTPHEADER => $header,
+              CURLOPT_POSTFIELDS => $postfields,
+              CURLOPT_HEADER => false,
+              CURLOPT_URL => $this->url ,
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_CUSTOMREQUEST  => "PUT"
+              );
+            break;
+
+            case 'DELETE':
+            $header = array($this->buildAuthorizationHeader($this->oauth), 'Expect:');
+            $options = array( 
+              CURLOPT_HTTPHEADER => $header,
+              CURLOPT_HEADER => false,
+              CURLOPT_URL => $this->url,
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_CUSTOMREQUEST  => "DELETE"
+              );
+            break;
+
+            default:
+            throw new Exception('Twitter API only supports GET, POST, PUT, and DELETE'); 
+            break;
+        }
 
         $feed = curl_init();
         curl_setopt_array($feed, $options);
         $json = curl_exec($feed);
+        $http_status = curl_getinfo($feed, CURLINFO_HTTP_CODE);
+        Log::info($http_status);
+        Log::info($options);
+        Log::info(json_encode($json));
         curl_close($feed);
 
         if ($return) { return $json; }
     }
-    
+
     /**
      * Private method to generate the base string used by cURL
      * 
