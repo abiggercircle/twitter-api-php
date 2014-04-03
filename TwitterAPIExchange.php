@@ -278,9 +278,9 @@ class TwitterAPIExchange
         curl_setopt_array($feed, $options);
         $json = curl_exec($feed);
         $http_status = curl_getinfo($feed, CURLINFO_HTTP_CODE);
-        Log::info($http_status);
-        Log::info($options);
-        Log::info(json_encode($json));
+        // Log::info($http_status);
+        // Log::info($options);
+        // Log::info(json_encode($json));
         curl_close($feed);
 
         if ($return) { return $json; }
