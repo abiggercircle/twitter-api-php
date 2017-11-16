@@ -1,10 +1,10 @@
 {
-  "name": "diginedbv/twitter-api-php",
+  "name": "abiggercircle/twitter-api-php",
   "description": "Simple PHP Wrapper for Twitter API v1.1 calls",
   "version": "0.99",
   "type": "library",
   "keywords": ["twitter", "PHP", "API"],
-  "homepage": "https://github.com/diginedbv/twitter-api-php",
+  "homepage": "https://github.com/abiggercircle/twitter-api-php",
   "license": "GNU Public License",
   "authors": [
     {
@@ -12,8 +12,8 @@
 	"homepage": "https://github.com/j7mbo/twitter-api-php"
 	},
 	{
-	"name" : "Digined",
-      "homepage": "http://digined.com"
+	"name" : "A Bigger Circle",
+      "homepage": "http://abiggercircle.com"
     }
   ],
   "autoload": {
