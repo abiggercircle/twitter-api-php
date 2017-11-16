@@ -1,7 +1,7 @@
 {
   "name": "abiggercircle/twitter-api-php",
   "description": "Simple PHP Wrapper for Twitter API v1.1 calls",
-  "version": "0.99",
+  "version": "0.99.1",
   "type": "library",
   "keywords": ["twitter", "PHP", "API"],
   "homepage": "https://github.com/abiggercircle/twitter-api-php",
